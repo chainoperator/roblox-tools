@@ -1,0 +1,1 @@
+type Config = { apiUrl: string; retries: number; timeout: number; debug: boolean; }; const defaultConfig: Config = { apiUrl: 'https://api.example.com', retries: 3, timeout: 5000, debug: false }; export function loadConfig(userConfig: Partial<Config>): Config { return { ...defaultConfig, ...userConfig }; }
