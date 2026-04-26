@@ -1,37 +1,39 @@
-type User = { id: string; name: string; email: string; isActive: boolean; };
+type UserInput = {username: string, age: number};
 
-type UserService = {
-    addUser: (user: User) => Promise<User>;
-    getUser: (id: string) => Promise<User | null>;
-    updateUser: (id: string, user: Partial<User>) => Promise<User | null>;
-    deleteUser: (id: string) => Promise<boolean>;
-};
+declare function isValidUsername(username: string): boolean {
+    return /^[a-zA-Z0-9_]{3,16}$/.test(username);
+}
 
-/**
- * User service implementation for managing users.
- * Provides methods to add, get, update, and delete users.
- */
-const userService: UserService = {
-    async addUser(user) {
-        // Simulate adding user logic
-        console.log('User added:', user);
-        return user;
-    },
-    async getUser(id) {
-        // Simulate fetching user logic
-        console.log('Fetching user with id:', id);
-        return { id, name: 'John Doe', email: 'john@example.com', isActive: true };
-    },
-    async updateUser(id, user) {
-        // Simulate user update logic
-        console.log('Updating user with id:', id, 'with data:', user);
-        return { id, ...user }; // Merge with existing data
-    },
-    async deleteUser(id) {
-        // Simulate delete user logic
-        console.log('Deleting user with id:', id);
-        return true; // Indicate success
-    },
-};
+declare function isValidAge(age: number): boolean {
+    return Number.isInteger(age) && age >= 13 && age <= 120;
+}
 
-export default userService;
+function processUserInput(input: UserInput): string {
+    if (!isValidUsername(input.username)) {
+        throw new Error('Invalid username: must be 3-16 chars and alphanumeric.');
+    }
+    if (!isValidAge(input.age)) {
+        throw new Error('Invalid age: must be an integer between 13 and 120.');
+    }
+    return `User ${input.username}, age ${input.age}, processed successfully.`;
+}
+
+function mainLoop(inputs: UserInput[]): void {
+    inputs.forEach(input => {
+        try {
+            const result = processUserInput(input);
+            console.log(result);
+        } catch (error) {
+            console.error(error.message);
+        }
+    });
+}
+
+const userInputs: UserInput[] = [
+    {username: 'Alice123', age: 25},
+    {username: 'Bob', age: 15},
+    {username: 'Caty!', age: 30},
+    {username: 'JohnDoe', age: -5},
+];
+
+mainLoop(userInputs);
