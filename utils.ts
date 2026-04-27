@@ -1,37 +1,31 @@
-// Input validation utility functions
-
-export interface InputData {
-    username: string;
-    age: number;
-    email: string;
+export interface RobloxData {
+    id: number;
+    name: string;
+    description: string;
+    creator: string;
 }
 
-export function validateUsername(username: string): boolean {
-    const usernameRegex = /^[a-zA-Z0-9_]{3,16}$/;
-    return usernameRegex.test(username);
-}
-
-export function validateAge(age: number): boolean {
-    return age >= 13 && age <= 120;
-}
-
-export function validateEmail(email: string): boolean {
-    const emailRegex = /^[\w-\.]+@[\w-]+\.com$/;
-    return emailRegex.test(email);
-}
-
-export function validateInput(data: InputData): boolean {
-    return (
-        validateUsername(data.username) &&
-        validateAge(data.age) &&
-        validateEmail(data.email)
-    );
-}
-
-export function processInput(data: InputData): void {
-    if (!validateInput(data)) {
-        throw new Error('Invalid input data');
+export async function fetchRobloxData(placeId: number): Promise<RobloxData> {
+    const response = await fetch(`https://api.roblox.com/places/${placeId}`);
+    if (!response.ok) {
+        throw new Error(`Error fetching data: ${response.status}`);
     }
-    // Proceed with processing the validated input
-    console.log('Processing input:', data);
+    const data = await response.json();
+    return {
+        id: data.PlaceId,
+        name: data.Name,
+        description: data.Description,
+        creator: data.Creator.Name,
+    };
+}
+
+export function formatRobloxData(data: RobloxData): string {
+    return `Game ID: ${data.id}\nName: ${data.name}\nDescription: ${data.description}\nCreated by: ${data.creator}`;
+}
+
+export function isRobloxData(obj: any): obj is RobloxData {
+    return typeof obj.id === 'number' &&
+           typeof obj.name === 'string' &&
+           typeof obj.description === 'string' &&
+           typeof obj.creator === 'string';
 }
