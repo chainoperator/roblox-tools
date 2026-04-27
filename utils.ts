@@ -1,22 +1,34 @@
-function safeExecute<T>(fn: () => T): { result?: T; error?: string } {
-    try {
-        const result = fn();
-        return { result };  
-    } catch (e) {
-        return { error: e instanceof Error ? e.message : 'Unknown error' };  
-    }
+function memoize(fn: (...args: any[]) => any) {
+    const cache = new Map();
+    return function(...args: any[]) {
+        const key = JSON.stringify(args);
+        if (cache.has(key)) {
+            return cache.get(key);
+        }
+        const result = fn(...args);
+        cache.set(key, result);
+        return result;
+    };
 }
 
-function validatePlayerData(player: any): boolean {
-    return player && typeof player.name === 'string' && typeof player.age === 'number';
+// Example of a time-consuming function
+function fibonacci(n: number): number {
+    if (n <= 1) return n;
+    return fibonacci(n - 1) + fibonacci(n - 2);
 }
 
-function handlePlayerData(player: any): { success: boolean; message?: string } {
-    const validity = validatePlayerData(player);
-    if (!validity) {
-        return { success: false, message: 'Invalid player data.' };
-    }
-    return { success: true };
+const memoizedFibonacci = memoize(fibonacci);
+
+// Usage
+console.log(memoizedFibonacci(10)); // Output: 55
+console.log(memoizedFibonacci(10)); // Cached result: Output: 55
+
+// Performance optimization example
+function optimizedSum(array: number[]): number {
+    return array.reduce((acc, val) => acc + val, 0);
 }
 
-export { safeExecute, validatePlayerData, handlePlayerData };
+const numbers = Array.from({ length: 1000000 }, (_, i) => i);
+console.time('optimizedSum');
+optimizedSum(numbers);
+console.timeEnd('optimizedSum');
