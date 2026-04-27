@@ -1,39 +1,46 @@
-type UserInput = {username: string, age: number};
-
-declare function isValidUsername(username: string): boolean {
-    return /^[a-zA-Z0-9_]{3,16}$/.test(username);
+/**
+ * Service for managing player data.
+ * Contains methods to get and update player information.
+ */
+export interface PlayerData {
+    id: string;
+    name: string;
+    score: number;
 }
 
-declare function isValidAge(age: number): boolean {
-    return Number.isInteger(age) && age >= 13 && age <= 120;
-}
+/**
+ * Class responsible for player data operations.
+ */
+export class PlayerService {
+    private players: Map<string, PlayerData> = new Map();
 
-function processUserInput(input: UserInput): string {
-    if (!isValidUsername(input.username)) {
-        throw new Error('Invalid username: must be 3-16 chars and alphanumeric.');
+    /**
+     * Adds a new player to the service.
+     * @param player - The player data to add.
+     */
+    public addPlayer(player: PlayerData): void {
+        this.players.set(player.id, player);
     }
-    if (!isValidAge(input.age)) {
-        throw new Error('Invalid age: must be an integer between 13 and 120.');
-    }
-    return `User ${input.username}, age ${input.age}, processed successfully.`;
-}
 
-function mainLoop(inputs: UserInput[]): void {
-    inputs.forEach(input => {
-        try {
-            const result = processUserInput(input);
-            console.log(result);
-        } catch (error) {
-            console.error(error.message);
+    /**
+     * Retrieves player data by ID.
+     * @param playerId - The ID of the player.
+     * @returns The player data if found, otherwise undefined.
+     */
+    public getPlayer(playerId: string): PlayerData | undefined {
+        return this.players.get(playerId);
+    }
+
+    /**
+     * Updates the score of an existing player.
+     * @param playerId - The ID of the player to update.
+     * @param newScore - The new score to set for the player.
+     */
+    public updatePlayerScore(playerId: string, newScore: number): void {
+        const player = this.getPlayer(playerId);
+        if (player) {
+            player.score = newScore;
+            this.players.set(playerId, player);
         }
-    });
+    }
 }
-
-const userInputs: UserInput[] = [
-    {username: 'Alice123', age: 25},
-    {username: 'Bob', age: 15},
-    {username: 'Caty!', age: 30},
-    {username: 'JohnDoe', age: -5},
-];
-
-mainLoop(userInputs);
