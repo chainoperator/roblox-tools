@@ -1,34 +1,37 @@
-function memoize(fn: (...args: any[]) => any) {
-    const cache = new Map();
-    return function(...args: any[]) {
-        const key = JSON.stringify(args);
-        if (cache.has(key)) {
-            return cache.get(key);
-        }
-        const result = fn(...args);
-        cache.set(key, result);
-        return result;
-    };
+// Input validation utility functions
+
+export interface InputData {
+    username: string;
+    age: number;
+    email: string;
 }
 
-// Example of a time-consuming function
-function fibonacci(n: number): number {
-    if (n <= 1) return n;
-    return fibonacci(n - 1) + fibonacci(n - 2);
+export function validateUsername(username: string): boolean {
+    const usernameRegex = /^[a-zA-Z0-9_]{3,16}$/;
+    return usernameRegex.test(username);
 }
 
-const memoizedFibonacci = memoize(fibonacci);
-
-// Usage
-console.log(memoizedFibonacci(10)); // Output: 55
-console.log(memoizedFibonacci(10)); // Cached result: Output: 55
-
-// Performance optimization example
-function optimizedSum(array: number[]): number {
-    return array.reduce((acc, val) => acc + val, 0);
+export function validateAge(age: number): boolean {
+    return age >= 13 && age <= 120;
 }
 
-const numbers = Array.from({ length: 1000000 }, (_, i) => i);
-console.time('optimizedSum');
-optimizedSum(numbers);
-console.timeEnd('optimizedSum');
+export function validateEmail(email: string): boolean {
+    const emailRegex = /^[\w-\.]+@[\w-]+\.com$/;
+    return emailRegex.test(email);
+}
+
+export function validateInput(data: InputData): boolean {
+    return (
+        validateUsername(data.username) &&
+        validateAge(data.age) &&
+        validateEmail(data.email)
+    );
+}
+
+export function processInput(data: InputData): void {
+    if (!validateInput(data)) {
+        throw new Error('Invalid input data');
+    }
+    // Proceed with processing the validated input
+    console.log('Processing input:', data);
+}
